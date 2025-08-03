@@ -1,0 +1,475 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMPHASIS Mod Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tsparticles.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes sonar-ping {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        @keyframes sonar-ping-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        @keyframes text-gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e7eb;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard */
+        }
+        
+        #tsparticles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            transform: translateY(-30px) scale(0.98);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        .modal-backdrop.active .modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .status-online { background-color: #22c55e; animation: sonar-ping 2s infinite ease-out; }
+        .status-offline { background-color: #ef4444; animation: sonar-ping-red 2.5s infinite ease-out; }
+
+        .text-gradient {
+            background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899, #3b82f6);
+            background-size: 200% 200%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+            animation: text-gradient-animation 5s ease infinite;
+        }
+        .header-glow { text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .version-toggle button {
+            transition: all 0.3s ease;
+            border: 2px solid #374151;
+        }
+        .version-toggle button.active {
+            background-image: linear-gradient(to right, #3b82f6, #60a5fa);
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .game-grid-bg {
+            background-image: linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px);
+            background-size: 3rem 3rem;
+        }
+        .game-item {
+            transition: transform 0.2s ease-in-out;
+        }
+        .game-item:hover {
+            transform: scale(1.05);
+        }
+        .game-item-img.grayscale {
+            filter: grayscale(100%) brightness(0.7);
+        }
+
+        /* Nav Tab Styling */
+        .nav-tab {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 0.5rem;
+        }
+        .nav-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .nav-tab:not(.active):hover {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+    </style>
+</head>
+<body class="antialiased" oncontextmenu="return false;">
+    <div id="tsparticles"></div>
+
+    <header class="bg-transparent fixed top-0 left-0 right-0 z-40">
+         <nav class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center bg-black/10 backdrop-blur-lg mt-4 rounded-full border border-gray-800">
+            <h1 class="text-xl sm:text-2xl font-extrabold text-white header-glow tracking-wider text-gradient">EMPHASIS</h1>
+            <div class="hidden sm:flex items-center gap-6">
+                <button id="mods-tab" class="nav-tab active font-semibold uppercase tracking-wider">Mods</button>
+                <button id="reseller-tab" class="nav-tab font-semibold uppercase tracking-wider">Reseller Panel</button>
+                <button id="status-tab" class="nav-tab font-semibold uppercase tracking-wider">Status</button>
+            </div>
+            <a href="https://t.me/emphasisshop" target="_blank" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 sm:px-5 rounded-full shadow-lg text-sm sm:text-base">Official Channel</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 pt-32 pb-12 relative z-10">
+        
+        <!-- Mobile Navigation Tabs -->
+        <div class="sm:hidden flex justify-around gap-4 mb-8 border-b border-gray-800 pb-2">
+            <button id="mods-tab-mobile" class="nav-tab active font-semibold uppercase tracking-wider text-sm">Mods</button>
+            <button id="reseller-tab-mobile" class="nav-tab font-semibold uppercase tracking-wider text-sm">Reseller</button>
+            <button id="status-tab-mobile" class="nav-tab font-semibold uppercase tracking-wider text-sm">Status</button>
+        </div>
+        
+        <!-- MODS PAGE -->
+        <div id="mods-page">
+            <section class="text-center py-12 sm:py-20 reveal">
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-4" style="font-family: 'Exo 2', sans-serif;">ELEVATE YOUR GAME</h2>
+                <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto">Access the most powerful and secure mods for your favorite games.</p>
+            </section>
+            
+            <div class="space-y-12">
+                 <div class="bg-black/30 p-4 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl reveal">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8 text-white header-glow uppercase tracking-widest" style="font-family: 'Exo 2', sans-serif;">How to Install</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
+                        <!-- Step 1 with Download Button -->
+                        <div class="install-step flex flex-col items-center justify-start p-4 rounded-lg bg-gray-900/50 border border-gray-700/50">
+                            <div class="install-step-number mb-3 flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xl">1</div>
+                            <div class="flex flex-col items-center h-full">
+                                <h3 class="font-bold text-base text-white">Download</h3>
+                                <p class="text-gray-400 text-sm mb-3">APK & MT Manager</p>
+                                <a href="https://d.apkpure.com/b/APK/bin.mt.plus?version=latest" download="" class="mt-auto btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg text-xs">Download</a>
+                            </div>
+                        </div>
+                        <div class="install-step flex flex-col items-center p-4 rounded-lg bg-gray-900/50 border border-gray-700/50"><div class="install-step-number mb-3 flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xl">2</div><div><h3 class="font-bold text-base text-white">Open Manager</h3><p class="text-gray-400 text-sm">Launch & grant perms</p></div></div>
+                        <div class="install-step flex flex-col items-center p-4 rounded-lg bg-gray-900/50 border border-gray-700/50"><div class="install-step-number mb-3 flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xl">3</div><div><h3 class="font-bold text-base text-white">Navigate</h3><p class="text-gray-400 text-sm">To Downloads</p></div></div>
+                        <div class="install-step flex flex-col items-center p-4 rounded-lg bg-gray-900/50 border border-gray-700/50"><div class="install-step-number mb-3 flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xl">4</div><div><h3 class="font-bold text-base text-white">Locate File</h3><p class="text-gray-400 text-sm">Find the .apks file</p></div></div>
+                        <div class="install-step flex flex-col items-center p-4 rounded-lg bg-gray-900/50 border border-gray-700/50"><div class="install-step-number mb-3 flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xl">5</div><div><h3 class="font-bold text-base text-white">Install Mod</h3><p class="text-gray-400 text-sm">Tap file & install</p></div></div>
+                        <div class="install-step flex flex-col items-center p-4 rounded-lg bg-gray-900/50 border border-gray-700/50"><div class="install-step-number mb-3 flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xl">6</div><div><h3 class="font-bold text-base text-white">Enjoy!</h3><p class="text-gray-400 text-sm">Launch and play</p></div></div>
+                    </div>
+                </div>
+
+                <div class="bg-black/30 p-4 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl reveal relative overflow-hidden game-grid-bg">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8 text-white uppercase tracking-widest" style="font-family: 'Exo 2', sans-serif;">Supported Games</h2>
+                    <div class="flex flex-wrap justify-center items-end gap-x-8 sm:gap-x-12 gap-y-8">
+                        <div class="game-item text-center cursor-pointer" onclick="openModal('codm-garena')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/codmgr.png" alt="CODM Garena" class="game-item-img max-h-full max-w-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=CODM-GR';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-sm sm:text-base text-white" style="font-family: 'Exo 2', sans-serif;">CODM Garena</h3><p class="text-xs uppercase tracking-widest invisible">Coming Soon</p></div>
+                         <div class="game-item text-center cursor-pointer" onclick="openModal('bloodstrike')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/bloodstrike.png" alt="Bloodstrike" class="game-item-img max-h-full max-w-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=Bloodstrike';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-sm sm:text-base text-white" style="font-family: 'Exo 2', sans-serif;">Bloodstrike</h3><p class="text-xs uppercase tracking-widest invisible">Coming Soon</p></div>
+                        <div class="game-item text-center cursor-pointer" onclick="openModal('codm-global')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/codmgl.png" alt="CODM Global" class="game-item-img grayscale" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=CODM-GL';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-gray-500 text-sm sm:text-base" style="font-family: 'Exo 2', sans-serif;">CODM Global</h3><p class="text-xs text-yellow-400 uppercase tracking-widest">Coming Soon</p></div>
+                         <div class="game-item text-center cursor-pointer" onclick="openModal('codm-korea')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/codmkr.png" alt="CODM Korea" class="game-item-img grayscale" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=CODM-KR';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-gray-500 text-sm sm:text-base" style="font-family: 'Exo 2', sans-serif;">CODM Korea</h3><p class="text-xs text-yellow-400 uppercase tracking-widest">Coming Soon</p></div>
+                        <div class="game-item text-center cursor-pointer" onclick="openModal('pubg')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/pubgm.png" alt="PUBG" class="game-item-img grayscale" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=PUBG';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-gray-500 text-sm sm:text-base" style="font-family: 'Exo 2', sans-serif;">PUBG</h3><p class="text-xs text-yellow-400 uppercase tracking-widest">Coming Soon</p></div>
+                        <div class="game-item text-center cursor-pointer" onclick="openModal('farlight')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/farlight.png" alt="Farlight" class="game-item-img grayscale" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=Farlight';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-gray-500 text-sm sm:text-base" style="font-family: 'Exo 2', sans-serif;">Farlight</h3> <p class="text-xs text-yellow-400 uppercase tracking-widest">Coming Soon</p></div>
+                        <div class="game-item text-center cursor-pointer" onclick="openModal('mlbb')"><div class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center"><img src="images/mlbb.png" alt="MLBB" class="game-item-img grayscale" onerror="this.onerror=null;this.src='https://placehold.co/112x112/0a0a0a/e5e7eb?text=MLBB';"></div><h3 class="mt-2 font-bold uppercase tracking-wider text-gray-500 text-sm sm:text-base" style="font-family: 'Exo 2', sans-serif;">MLBB</h3> <p class="text-xs text-yellow-400 uppercase tracking-widest">Coming Soon</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESELLER PAGE -->
+        <div id="reseller-page" class="hidden">
+             <section class="text-center py-12 sm:py-20 reveal">
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-4" style="font-family: 'Exo 2', sans-serif;">RESELLER PANEL</h2>
+                <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto">Join our team and start earning by reselling our premium mods.</p>
+            </section>
+
+            <div class="bg-black/30 p-4 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl reveal game-grid-bg">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8 text-white uppercase tracking-widest" style="font-family: 'Exo 2', sans-serif;">Panel Pricelist</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                    <!-- Reseller Card 1 -->
+                    <div class="reseller-card bg-gray-900/50 p-6 rounded-lg border border-gray-700 text-center flex flex-col">
+                        <h3 class="text-xl font-bold text-blue-400">20K Saldo</h3>
+                        <p class="text-4xl font-black my-4">250₱<span class="text-base font-medium text-gray-400">/month</span></p>
+                        <ul class="space-y-2 text-gray-300 text-sm flex-grow">
+                            <li>Can make up to 20K keys</li>
+                            <li>Resell 1 of any of our mods</li>
+                            <li>Earn up to 5K pesos</li>
+                            <li class="font-bold text-green-400">Free Rebrand of 1 Game</li>
+                        </ul>
+                    </div>
+                    <!-- Reseller Card 2 -->
+                    <div class="reseller-card bg-gray-900/50 p-6 rounded-lg border border-gray-700 text-center flex flex-col">
+                        <h3 class="text-xl font-bold text-blue-400">50K Saldo</h3>
+                        <p class="text-4xl font-black my-4">350₱<span class="text-base font-medium text-gray-400">/month</span></p>
+                         <ul class="space-y-2 text-gray-300 text-sm flex-grow">
+                            <li>Can make up to 50K keys</li>
+                            <li>Resell 1 of any of our mods</li>
+                            <li>Earn up to 7K pesos</li>
+                            <li class="font-bold text-green-400">Free Rebrand of 2 Games</li>
+                        </ul>
+                    </div>
+                    <!-- Reseller Card 3 -->
+                    <div class="reseller-card bg-gray-900/50 p-6 rounded-lg border border-gray-700 text-center flex flex-col">
+                        <h3 class="text-xl font-bold text-blue-400">100K Saldo</h3>
+                        <p class="text-4xl font-black my-4">550₱<span class="text-base font-medium text-gray-400">/month</span></p>
+                         <ul class="space-y-2 text-gray-300 text-sm flex-grow">
+                            <li>Can make up to 100K keys</li>
+                            <li>Resell 1 of any of our mods</li>
+                            <li>Earn up to 10K pesos</li>
+                            <li class="font-bold text-green-400">Free Rebrand of 3 Games</li>
+                        </ul>
+                    </div>
+                     <!-- Reseller Card 4 -->
+                    <div class="reseller-card bg-gray-900/50 p-6 rounded-lg border-2 border-yellow-400 text-center flex flex-col shadow-lg shadow-yellow-400/10">
+                        <h3 class="text-xl font-bold text-yellow-400">Unlimited Saldo</h3>
+                        <p class="text-4xl font-black my-4">999₱<span class="text-base font-medium text-gray-400">/lifetime</span></p>
+                         <ul class="space-y-2 text-gray-300 text-sm flex-grow">
+                            <li>Unlimited key creation</li>
+                            <li>Resell 1 of any of our mods</li>
+                            <li>Unlimited earnings</li>
+                            <li class="font-bold text-green-400">Free Rebrand of 4 Games</li>
+                        </ul>
+                    </div>
+                </div>
+                 <div class="mt-8 pt-8 border-t border-gray-800 text-center">
+                    <h3 class="text-xl font-bold text-white mb-4" style="font-family: 'Exo 2', sans-serif;">How It Works & Payments</h3>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Pick 1 game that you would resell from our list of mods. The first game license is free. To resell another game, a license costs 100 PHP.</p>
+                    <p class="text-gray-300 font-semibold mt-4">Visit <a href="https://kaleidoscopic-kulfi-28c5a9.netlify.app/" target="_blank" class="text-blue-400 hover:underline">zxiofficial.site</a> to see mod status.</p>
+                     <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mt-6">
+                        <a href="https://t.me/emphasis7" target="_blank" class="flex-1 text-center btn bg-sky-500 hover:bg-sky-600 py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2"><img src="images/gcash.png" alt="GCash" class="w-6 h-6 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/24x24/1e90ff/ffffff?text=G';"><span>GCash (via @emphasis7)</span></a>
+                        <a href="https://t.me/cevixXx" target="_blank" class="flex-1 text-center btn bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2"><img src="images/paypal.png" alt="PayPal" class="w-6 h-6" onerror="this.onerror=null;this.src='https://placehold.co/24x24/4b0082/ffffff?text=P';"><span>PayPal (via @cevixXx)</span></a>
+                    </div>
+                    <a href="https://t.me/emphasisshop" target="_blank" class="mt-4 inline-block text-cyan-400 hover:text-cyan-300">View Feedbacks</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STATUS PAGE -->
+        <div id="status-page" class="hidden">
+            <section class="text-center py-12 sm:py-20 reveal">
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-4" style="font-family: 'Exo 2', sans-serif;">MOD STATUS</h2>
+                <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto">Live status updates for all our available game mods.</p>
+            </section>
+            <div class="bg-black/30 p-4 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl reveal game-grid-bg">
+                <div class="space-y-4">
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/codmgr.png" class="w-12 h-12 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=GR';">
+                            <span class="font-bold text-lg">CODM Garena</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-green-400">ONLINE</span>
+                            <div class="w-4 h-4 rounded-full status-online"></div>
+                        </div>
+                    </div>
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/bloodstrike.png" class="w-12 h-12 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=BS';">
+                            <span class="font-bold text-lg">Bloodstrike</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-green-400">ONLINE</span>
+                            <div class="w-4 h-4 rounded-full status-online"></div>
+                        </div>
+                    </div>
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/codmgl.png" class="w-12 h-12 object-contain grayscale" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=GL';">
+                            <span class="font-bold text-lg text-gray-500">CODM Global</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-red-400">OFFLINE</span>
+                            <div class="w-4 h-4 rounded-full status-offline"></div>
+                        </div>
+                    </div>
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/codmkr.png" class="w-12 h-12 object-contain grayscale" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=KR';">
+                            <span class="font-bold text-lg text-gray-500">CODM Korea</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-red-400">OFFLINE</span>
+                            <div class="w-4 h-4 rounded-full status-offline"></div>
+                        </div>
+                    </div>
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/pubgm.png" class="w-12 h-12 object-contain grayscale" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=PUBG';">
+                            <span class="font-bold text-lg text-gray-500">PUBG</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-yellow-400">UPDATING</span>
+                        </div>
+                    </div>
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/farlight.png" class="w-12 h-12 object-contain grayscale" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=FL';">
+                            <span class="font-bold text-lg text-gray-500">Farlight</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-red-400">OFFLINE</span>
+                            <div class="w-4 h-4 rounded-full status-offline"></div>
+                        </div>
+                    </div>
+                    <!-- Status Item -->
+                    <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                        <div class="flex items-center gap-4">
+                            <img src="images/mlbb.png" class="w-12 h-12 object-contain grayscale" onerror="this.onerror=null;this.src='https://placehold.co/48x48/0a0a0a/e5e7eb?text=MLBB';">
+                            <span class="font-bold text-lg text-gray-500">MLBB</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="font-semibold text-red-400">OFFLINE</span>
+                            <div class="w-4 h-4 rounded-full status-offline"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- Modals -->
+    <div id="modal-codm-garena" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900/80 backdrop-blur-sm rounded-lg shadow-xl p-6 sm:p-8 border border-blue-500/50"><div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6"><h2 class="text-2xl sm:text-3xl font-bold text-blue-400 header-glow">EMPHASIS (CODM)</h2><div class="version-toggle bg-gray-800 rounded-lg p-1 flex"><button id="v5-btn" onclick="setVersion('v5')" class="flex-1 py-2 px-4 rounded-md text-gray-400 font-semibold text-sm">V5</button><button id="v6-btn" onclick="setVersion('v6')" class="flex-1 py-2 px-4 rounded-md text-gray-400 font-semibold active text-sm">V6</button></div></div><div id="v6-features"><div class="grid md:grid-cols-2 gap-8 text-gray-300"><div><h3 class="font-semibold text-lg sm:text-xl text-white mb-3 border-b-2 border-blue-500/50 pb-2">V6 Exclusive Upgrades</h3><ul class="list-disc list-inside space-y-2 text-sm text-green-300"><li>All not working features in V5 are now working on V6.</li><li>More Features than V5.</li><li>All Legendary and Mythic skins added.</li></ul></div><div><h3 class="font-semibold text-lg sm:text-xl text-white mb-3 border-b-2 border-blue-500/50 pb-2">Core Protections</h3><ul class="list-disc list-inside space-y-2 text-sm"><li>Safe For Main Account</li><li>Good to Push Rank</li><li>Super Safe Bypass (No Bans)</li><li>Direct Install and Play</li></ul></div></div></div><div id="v5-features" class="hidden"><div class="grid md:grid-cols-2 gap-8 text-gray-300"><div><h3 class="font-semibold text-lg sm:text-xl text-white mb-3 border-b-2 border-gray-600 pb-2">V5 Standard Features</h3><ul class="list-disc list-inside space-y-2 text-sm"><li>Basic Bypass Protections</li><li>Good for casual play</li><li>Standard Skin Hacks</li><li>Supports most Android devices</li></ul></div><div><h3 class="font-semibold text-lg sm:text-xl text-white mb-3 border-b-2 border-gray-600 pb-2">Limitations</h3><ul class="list-disc list-inside space-y-2 text-sm text-yellow-400"><li>Some features may be unstable</li><li>Limited high-tier skin support</li><li>Older bypass, use with caution</li></ul></div></div></div><div class="mt-8"><h3 class="font-semibold text-lg sm:text-xl text-white mb-4 text-center">Price List (<span id="version-label" class="text-blue-400">V6</span>)</h3><div id="price-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-center"></div></div><div class="mt-8"><h3 class="font-semibold text-lg text-white mb-3 text-center">Payment Methods</h3><div class="flex flex-col sm:flex-row gap-4"><a href="https://t.me/emphasis7" target="_blank" class="flex-1 text-center btn bg-sky-500 hover:bg-sky-600 py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2"><img src="images/gcash.png" alt="GCash" class="w-6 h-6 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/24x24/1e90ff/ffffff?text=G';"><span>GCash (via @emphasis7)</span></a><a href="https://t.me/cevixXx" target="_blank" class="flex-1 text-center btn bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2"><img src="images/paypal.png" alt="PayPal" class="w-6 h-6" onerror="this.onerror=null;this.src='https://placehold.co/24x24/4b0082/ffffff?text=P';"><span>PayPal (via @cevixXx)</span></a></div><p class="text-xs text-center text-red-400 mt-4 font-bold">BUY AT YOUR OWN RISK!</p></div><button onclick="closeModal('codm-garena')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-transform hover:scale-125"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div></div>
+    <div id="modal-bloodstrike" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-900/80 backdrop-blur-sm rounded-lg shadow-xl p-6 sm:p-8 border border-red-500/50"><h2 class="text-2xl sm:text-3xl font-bold text-red-400 mb-6 header-glow">BLOODSTRIKE MOD</h2><div class="mb-6"><h3 class="font-semibold text-lg sm:text-xl text-white mb-3 border-b-2 border-red-500/50 pb-2">Features</h3><ul class="list-disc list-inside space-y-2 text-sm text-gray-300 sm:columns-2"><li>Esp Optimized</li><li>AimHacks (Not Gyro)</li><li>No Recoil & No Spread</li><li>Unique Custom UI</li><li>SpeedHacks</li><li>Skin Hacks</li><li>Login Key | Kuro Login</li><li>Protected By AntiCrack</li><li>Safe No Ban & No Issue</li><li>No Method Required</li></ul></div><div class="mt-8"><h3 class="font-semibold text-lg sm:text-xl text-white mb-4 text-center">Price List</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-center"><div class="bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-red-500 hover:scale-105 transition-all"><p class="font-bold text-white text-sm">03 Days</p><p class="text-red-400 text-base sm:text-lg font-semibold">49₱ / 2$</p></div><div class="bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-red-500 hover:scale-105 transition-all"><p class="font-bold text-white text-sm">07 Days</p><p class="text-red-400 text-base sm:text-lg font-semibold">99₱ / 3$</p></div><div class="bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-red-500 hover:scale-105 transition-all"><p class="font-bold text-white text-sm">15 Days</p><p class="text-red-400 text-base sm:text-lg font-semibold">199₱ / 4$</p></div><div class="bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-red-500 hover:scale-105 transition-all"><p class="font-bold text-white text-sm">30 Days</p><p class="text-red-400 text-base sm:text-lg font-semibold">299₱ / 6$</p></div><div class="bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-red-500 hover:scale-105 transition-all"><p class="font-bold text-white text-sm">60 Days</p><p class="text-red-400 text-base sm:text-lg font-semibold">399₱ / 8$</p></div><div class="bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-red-500 hover:scale-105 transition-all"><p class="font-bold text-white text-sm">Lifetime</p><p class="text-red-400 text-base sm:text-lg font-semibold">699₱ / 12$</p></div></div></div><div class="mt-8"><h3 class="font-semibold text-lg text-white mb-3 text-center">Payment Methods</h3><div class="flex flex-col sm:flex-row gap-4"><a href="https://t.me/emphasis7" target="_blank" class="flex-1 text-center btn bg-sky-500 hover:bg-sky-600 py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2"><img src="images/gcash.png" alt="GCash" class="w-6 h-6 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/24x24/1e90ff/ffffff?text=G';"><span>GCash (via @emphasis7)</span></a><a href="https://t.me/cevixXx" target="_blank" class="flex-1 text-center btn bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2"><img src="images/paypal.png" alt="PayPal" class="w-6 h-6" onerror="this.onerror=null;this.src='https://placehold.co/24x24/4b0082/ffffff?text=P';"><span>PayPal (via @cevixXx)</span></a></div><p class="text-xs text-center text-red-400 mt-4 font-bold">BUY AT YOUR OWN RISK!</p></div><button onclick="closeModal('bloodstrike')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-transform hover:scale-125"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div></div>
+    <div id="modal-codm-global" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content text-center bg-gray-900/80 backdrop-blur-sm w-full max-w-md rounded-lg shadow-xl p-8 border border-yellow-500/50"><h2 class="text-3xl font-bold text-yellow-400 mb-4 header-glow">CODM Global</h2><p class="text-gray-300 text-lg">Mod is currently <span class="font-bold text-white">under development</span>. Check back later!</p><button onclick="closeModal('codm-global')" class="mt-6 w-full btn bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg">Close</button></div></div>
+    <div id="modal-codm-korea" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content text-center bg-gray-900/80 backdrop-blur-sm w-full max-w-md rounded-lg shadow-xl p-8 border border-purple-500/50"><h2 class="text-3xl font-bold text-purple-400 mb-4 header-glow">CODM Korea</h2><p class="text-gray-300 text-lg">Mod is <span class="font-bold text-white">in progress</span>. Info will be available soon.</p><button onclick="closeModal('codm-korea')" class="mt-6 w-full btn bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg">Close</button></div></div>
+    <div id="modal-mlbb" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content text-center bg-gray-900/80 backdrop-blur-sm w-full max-w-md rounded-lg shadow-xl p-8 border border-amber-500/50"><h2 class="text-3xl font-bold text-amber-400 mb-4 header-glow">MLBB</h2><p class="text-gray-300 text-lg">Mod is currently <span class="font-bold text-white">under progress</span>. Check back later!</p><button onclick="closeModal('mlbb')" class="mt-6 w-full btn bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg">Close</button></div></div>
+    <div id="modal-farlight" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content text-center bg-gray-900/80 backdrop-blur-sm w-full max-w-md rounded-lg shadow-xl p-8 border border-cyan-500/50"><h2 class="text-3xl font-bold text-cyan-400 mb-4 header-glow">Farlight</h2><p class="text-gray-300 text-lg">Mod is currently <span class="font-bold text-white">under progress</span>. Check back later!</p><button onclick="closeModal('farlight')" class="mt-6 w-full btn bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg">Close</button></div></div>
+    <div id="modal-pubg" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden"><div class="modal-content text-center bg-gray-900/80 backdrop-blur-sm w-full max-w-md rounded-lg shadow-xl p-8 border border-lime-500/50"><h2 class="text-3xl font-bold text-lime-400 mb-4 header-glow">PUBG</h2><p class="text-gray-300 text-lg">Mod is currently <span class="font-bold text-white">under progress</span>. Check back later!</p><button onclick="closeModal('pubg')" class="mt-6 w-full btn bg-lime-500 hover:bg-lime-600 text-white font-semibold py-2 px-4 rounded-lg">Close</button></div></div>
+
+    <script>
+        // Anti-dumping script
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+            }
+        });
+        
+        const antiDebug = () => {
+            function check() {
+                const a = new Date();
+                debugger;
+                const b = new Date();
+                if (b - a > 100) {
+                    document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:black;color:white;display:flex;justify-content:center;align-items:center;font-size:2rem;">Developer tools are not allowed.</div>';
+                }
+            }
+            setInterval(check, 1000);
+        };
+        antiDebug();
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const isMobile = window.innerWidth < 768;
+
+            const desktopParticlesConfig = {
+                fpsLimit: 60,
+                particles: {
+                    number: { value: 40, density: { enable: true, value_area: 800 } },
+                    color: { value: "#3b82f6" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+                    size: { value: 2, random: true },
+                    line_linked: { enable: true, distance: 150, color: "#1f2937", opacity: 0.4, width: 1 },
+                    move: { enable: true, speed: 1, direction: "none", random: false, straight: false, out_mode: "out" }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: { grab: { distance: 140, line_opacity: 1 }, push: { particles_nb: 4 } }
+                },
+                detectRetina: true,
+            };
+
+            const mobileParticlesConfig = {
+                fpsLimit: 30,
+                particles: {
+                    number: { value: 20, density: { enable: true, value_area: 800 } },
+                    color: { value: "#3b82f6" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 2, random: true },
+                    line_linked: { enable: false },
+                    move: { enable: true, speed: 1.5, direction: "none", random: true, straight: false, out_mode: "out" }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: { push: { particles_nb: 2 } }
+                },
+                detectRetina: true,
+            };
+
+            tsParticles.load("tsparticles", isMobile ? mobileParticlesConfig : desktopParticlesConfig);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // Tab switching logic
+            const tabs = document.querySelectorAll('.nav-tab');
+            const pages = {
+                mods: document.getElementById('mods-page'),
+                reseller: document.getElementById('reseller-page'),
+                status: document.getElementById('status-page'),
+            };
+
+            const switchTab = (tabName) => {
+                Object.keys(pages).forEach(page => {
+                    pages[page].classList.add('hidden');
+                });
+                pages[tabName].classList.remove('hidden');
+
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                document.getElementById(`${tabName}-tab-mobile`).classList.add('active');
+            }
+
+            document.getElementById('mods-tab').addEventListener('click', () => switchTab('mods'));
+            document.getElementById('reseller-tab').addEventListener('click', () => switchTab('reseller'));
+            document.getElementById('status-tab').addEventListener('click', () => switchTab('status'));
+            document.getElementById('mods-tab-mobile').addEventListener('click', () => switchTab('mods'));
+            document.getElementById('reseller-tab-mobile').addEventListener('click', () => switchTab('reseller'));
+            document.getElementById('status-tab-mobile').addEventListener('click', () => switchTab('status'));
+        });
+
+        function openModal(modalId){if(modalId==='codm-garena')setVersion('v6');const modal=document.getElementById('modal-'+modalId);if(modal){modal.classList.remove('hidden');document.body.style.overflow='hidden';setTimeout(()=>modal.classList.add('active'),10)}}
+        function closeModal(modalId){const modal=document.getElementById('modal-'+modalId);if(modal){modal.classList.remove('active');setTimeout(()=>{modal.classList.add('hidden');document.body.style.overflow='';},400)}}
+        document.addEventListener('keydown',(e)=>{if(e.key==="Escape")document.querySelectorAll('.modal-backdrop.active').forEach(m=>closeModal(m.id.replace('modal-','')))});
+        document.querySelectorAll('.modal-backdrop').forEach(m=>{m.addEventListener('click',(e)=>{if(e.target===m)closeModal(m.id.replace('modal-',''))})});
+        const garenaPrices={v6:[{term:'03 Days',php:40,usd:2},{term:'07 Days',php:80,usd:3},{term:'15 Days',php:180,usd:4},{term:'30 Days',php:220,usd:6},{term:'60 Days',php:380,usd:8},{term:'Lifetime',php:599,usd:12}]};
+        garenaPrices.v5=garenaPrices.v6.map(p=>({term:p.term,php:Math.round(p.php*0.95),usd:Math.round(p.usd*0.95)}));
+        const v5btn=document.getElementById('v5-btn'),v6btn=document.getElementById('v6-btn'),v5feats=document.getElementById('v5-features'),v6feats=document.getElementById('v6-features'),versionLabel=document.getElementById('version-label'),priceGrid=document.getElementById('price-grid');
+        function setVersion(version){const prices=garenaPrices[version];versionLabel.textContent=version.toUpperCase();priceGrid.innerHTML='';prices.forEach(price=>{const div=document.createElement('div');div.className='bg-gray-800/50 p-3 sm:p-4 rounded-lg border border-gray-700 hover:border-blue-500 hover:scale-105 transition-all';div.innerHTML=`<p class="font-bold text-white text-sm">${price.term}</p><p class="text-blue-400 text-base sm:text-lg font-semibold">${price.php}₱ / ${price.usd}$</p>`;priceGrid.appendChild(div);});if(version==='v5'){v5btn.classList.add('active');v6btn.classList.remove('active');v5feats.classList.remove('hidden');v6feats.classList.add('hidden');}else{v6btn.classList.add('active');v5btn.classList.remove('active');v6feats.classList.remove('hidden');v5feats.classList.add('hidden');}}
+    </script>
+
+
+</body></html>
